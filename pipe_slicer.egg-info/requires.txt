@@ -1,9 +1,0 @@
-numpy
-scipy
-trimesh
-shapely
-pytest
-pyglet<2
-networkx
-matplotlib
-rtree
