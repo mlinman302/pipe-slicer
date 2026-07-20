@@ -2,3 +2,4 @@
 .vscode
 tests
 *.egg-info
+__pycache__
