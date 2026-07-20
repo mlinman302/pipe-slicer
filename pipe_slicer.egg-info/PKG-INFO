@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: pipe_slicer
+Version: 0.1.0
+Requires-Python: >=3.11
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: trimesh
+Requires-Dist: shapely
+Requires-Dist: pytest
+Requires-Dist: pyglet<2
+Requires-Dist: networkx
+Requires-Dist: matplotlib
+Requires-Dist: rtree

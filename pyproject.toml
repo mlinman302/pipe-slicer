@@ -1,0 +1,15 @@
+[project]
+name = "pipe_slicer"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "scipy",
+    "trimesh",
+    "shapely",
+    "pytest",
+    "pyglet<2",
+    "networkx",
+    "matplotlib",
+    "rtree"
+]

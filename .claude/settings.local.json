@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& .\\\\venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\maxin\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-maxin-Documents-GitHub-pipe-slicer-v2\\\\974294ec-2abd-47b0-a5ac-f93e55a8ca31\\\\scratchpad\\\\test_spiral.py\")"
+    ]
+  }
+}
