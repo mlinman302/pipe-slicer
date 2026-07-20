@@ -1,2 +1,4 @@
 .claude
 .vscode
+tests
+*.egg-info
