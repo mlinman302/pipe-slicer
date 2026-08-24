@@ -7,7 +7,6 @@ from pipe_slicer.flow import flow
 from pipe_slicer.gcode import emitter
 from pathlib import Path
 from pipe_slicer.types import GCodeConfig
-import trimesh
 
 TEST_DATA = Path.cwd() / "tests" / "tubes"
 
@@ -19,13 +18,13 @@ try:
     importTube = load.importTube(TEST_DATA / "tube.STL")
 except TypeError:
     print("Error in opening test tube file")
-segmented = load.segmentMesh(importTube)
+segmented = load.alignToBuildPlate(load.segmentMesh(importTube))
 
 ### centerline analysis ###
 cl = centerline.calcCenterline(segmented, wall="outer")
 
 ### slicing and flow ###
-step_dist = 0.4
+step_dist = 10
 slices = slicer.calcSlices(cl, segmented.outer, step_dist=step_dist)
 spiral = spiral.calcSpiralPath(slices)
 
