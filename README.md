@@ -104,35 +104,21 @@ bend, less plastic) and **red = overfed** (outside, more plastic).
 
 [`gcode/emitter.py`](pipe_slicer/gcode/emitter.py)
 
-Each spiral segment becomes one `G1` move on **X, Y, Z and B**. The extruded
-volume per segment is `lineWidth · h · segmentLength · flow`, divided by the
-filament cross-section to get the absolute E value. The result is a
-ready-to-print program ([`GCodeConfig`](pipe_slicer/types.py) holds the
-printer/material parameters):
+Each spiral segment becomes one `G1` move. The extruded volume per segment is
+`lineWidth · h · segmentLength · flow`, divided by the filament cross-section to
+get the absolute E value. The result is a ready-to-print program
+([`GCodeConfig`](pipe_slicer/types.py) holds the printer/material parameters):
 
 ```gcode
 ; --- spiral body ---
 M82 ; absolute extrusion
 G92 E0
-G0 F6000 X174.094 Y56.272 Z39.222 B0.612
+G0 F6000 X174.094 Y56.272 Z39.222
 G1 F1200
-G1 X173.377 Y56.242 Z39.232 B0.612 E0.05365
-G1 X172.661 Y56.211 Z39.241 B0.612 E0.10730
-G1 X171.945 Y56.181 Z39.251 B0.612 E0.16094
+G1 X173.377 Y56.242 Z39.232 E0.05365
+G1 X172.661 Y56.211 Z39.241 E0.10730
+G1 X171.945 Y56.181 Z39.251 E0.16094
 ```
-
-**B** is the rotary tool axis: how far the nozzle deviates from vertical, in
-degrees, dictated by the local centerline tangent `T`:
-
-```
-B = angle(T, +Z)        degrees, a magnitude in [0, 180]
-```
-
-Each point's tangent is blended between the two slices it spans, the same way
-its position is, so B sweeps smoothly instead of stepping at winding
-boundaries. On the example part B runs from 0.6° where the tube leaves the
-build plate to 91.7° at the far end of the elbow, changing by at most 0.003°
-per move.
 
 ---
 

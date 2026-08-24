@@ -73,15 +73,6 @@ def _sampleRing(ring: np.ndarray, angles: np.ndarray, tVals: np.ndarray) -> np.n
     return sampled
 
 
-def _unitize(vectors: np.ndarray) -> np.ndarray:
-    """Normalize rows, leaving degenerate (near-zero) rows untouched."""
-    lengths = np.linalg.norm(vectors, axis=1)
-    lengths = np.where(lengths < 1e-12, 1.0, lengths)
-    return vectors / lengths[:, np.newaxis]
-
-
-
-
 def calcSpiralPath(
         slices: list[Slice],
         pointsPerLoop: int = 200
@@ -118,7 +109,6 @@ def calcSpiralPath(
     tVals = np.linspace(0.0, 1.0, pointsPerLoop, endpoint=False)
 
     loops = []
-    tangentLoops = []
     for idx in range(len(parametrized) - 1):
         ring, angles = parametrized[idx]
         ringNext, anglesNext = parametrized[idx + 1]
@@ -129,19 +119,8 @@ def calcSpiralPath(
         blend = tVals[:, np.newaxis]
         loops.append((1.0 - blend) * current + blend * target)
 
-        # the centerline tangent blends across the same pair of slices as the
-        # position does, so the head sweeps smoothly from one ring's frame to
-        # the next instead of stepping at the winding boundary
-        tangentLoops.append(
-            (1.0 - blend) * slices[idx].frame.tangent
-            + blend * slices[idx + 1].frame.tangent
-        )
-
     # terminate the spiral exactly on the last ring's zero point
     loops.append(parametrized[-1][0][np.newaxis, 0])
-    tangentLoops.append(slices[-1].frame.tangent[np.newaxis, :])
 
     spiralPoints = np.vstack(loops)
-    tangents = _unitize(np.vstack(tangentLoops)) # blending two unit vectors shortens them
-
-    return Spiral(spiralPoints, pointsPerLoop, tangents)
+    return Spiral(spiralPoints, pointsPerLoop)

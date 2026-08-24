@@ -94,25 +94,3 @@ def segmentMesh(mesh: tm.Trimesh) -> SegmentedMesh:
 
     return sm
 
-
-def alignToBuildPlate(sm: SegmentedMesh) -> SegmentedMesh:
-    """
-    Move the tube from CAD coordinates into machine coordinates.
-
-    The whole tube is translated (never rotated or scaled) so that the
-    centroid of the bottom face lands on (0, 0, 0), the centre of the build
-    plate. Every downstream stage - centerline, slices, spiral, gcode - works
-    in the coordinates handed to it, so this is the only place the part is
-    placed on the machine.
-
-    Returns a new SegmentedMesh; the input is left untouched.
-    """
-    offset = -np.asarray(sm.bottom.centroid, dtype=float)
-
-    moved = [
-        face.copy().apply_translation(offset)
-        for face in (sm.bottom, sm.top, sm.inner, sm.outer)
-    ]
-
-    return SegmentedMesh(*moved)
-

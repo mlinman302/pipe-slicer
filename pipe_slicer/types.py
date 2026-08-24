@@ -5,7 +5,6 @@ import trimesh
 import trimesh.path as path
 import trimesh.path.entities as entities
 import skeletor
-from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -74,10 +73,6 @@ class Slice:
 class Spiral:
     points: np.ndarray
     pointsPerLoop: int # samples per full winding (theta advances 2*pi every pointsPerLoop points)
-    tangents: np.ndarray # per-point centerline tangent (unit), blended between the slices the point spans
-
-    def getTangents(self) -> np.ndarray:
-        return self.tangents
 
     def toPath3D(self):
         numPoints = self.points.shape[0]
@@ -141,7 +136,7 @@ class GCodeProgram:
     def toString(self) -> str:
         return "\n".join(self.preamble + self.body + self.postamble) + "\n"
 
-    def save(self, filePath: str | Path) -> None:
+    def save(self, filePath) -> None:
         with open(filePath, "w") as f:
             f.write(self.toString())
 
