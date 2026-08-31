@@ -118,13 +118,35 @@ class GCodeConfig:
     """
     filamentDiameter: float = 1.75 # filament stock diameter
     lineWidth: float = 0.45        # extruded bead width (single wall in vase mode)
-    printFeedrate: float = 1200.0  # extrusion move speed, mm/min
+    printFeedrate: float = 400.0  # extrusion move speed, mm/min
     travelFeedrate: float = 6000.0 # non-extruding move speed, mm/min
-    nozzleTemp: float = 210.0
+    firstLayerFeedrate: float = 150.0 # extrusion speed at the build plate, mm/min
+    speedRampLayers: float = 3.0   # windings over which the feedrate recovers to printFeedrate
+    nozzleTemp: float = 200.0
     bedTemp: float = 60.0
 
     def filamentArea(self) -> float:
         return np.pi * (self.filamentDiameter / 2.0) ** 2
+
+
+@dataclass(frozen=True)
+class PurgeConfig:
+    """
+    Purge ("prime line") drawn before the part, sized for a polar bed: the
+    straight lines a cartesian printer draws along one edge of the plate
+    become concentric arcs swept at a fixed radius.
+    """
+    radius: float = 55.0        # radius of the outermost purge arc, mm
+    sweep: float = 180.0        # angle swept by each arc, degrees
+    startAngle: float = 0.0     # azimuth the first arc starts at, degrees
+    passes: int = 2             # concentric arcs, each stepped inward by lineWidth
+    layerHeight: float = 0.3    # z height / bead thickness of the purge arcs
+    lineWidth: float = 0.6      # bead width (wider than the part, as is usual for a purge)
+    feedrate: float = 900.0     # extrusion speed of the purge, mm/min
+    segmentAngle: float = 2.0   # arc discretization step, degrees
+    primeAmount: float = 3.0    # filament extruded stationary before moving, mm
+    retract: float = 1.0        # retraction after the purge, mm
+    wipeAngle: float = 10.0     # un-extruded move continuing the last arc, degrees
 
 
 @dataclass(frozen=True)
