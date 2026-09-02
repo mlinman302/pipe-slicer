@@ -125,7 +125,7 @@ def emitGcode(
     tangents = flowSpiral.spiral.tangents
 
     # B angle that aims the nozzle along the centerline tangent
-    bRotation = calcBAngle(tangents)
+    bRotation = -1 * calcBAngle(tangents)
 
     slicedPoints = np.column_stack((points[:, 0], points[:, 1], points[:, 2], bRotation))
 
