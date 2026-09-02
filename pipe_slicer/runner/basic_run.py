@@ -40,7 +40,7 @@ flowSpiral = adhesion.rampFirstLayers(flowSpiral, firstLayerRatio=0.75, rampLaye
 ### gcode emission ###
 emitter.emitGcode(
     flowSpiral,
-    GCodeConfig(lineWidth=0.8, firstLayerFeedrate=150.0, speedRampLayers=rampLayers),
+    GCodeConfig(lineWidth=1.2, travelFeedrate=1000.0),
     purge=PurgeConfig()
 ).save(TEST_DATA / "gcodeOut" / "tube.gcode")
 
