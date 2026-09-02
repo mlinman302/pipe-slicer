@@ -2,16 +2,56 @@ from pipe_slicer.types import FlowSpiral, GCodeConfig, GCodeProgram, PurgeConfig
 import numpy as np
 import matplotlib.pyplot as plt
 
-def rotOntoXZ(vectors: np.ndarray) -> np.ndarray:
-    """Rotate row vectors about onto XZ plane"""
+def projectOntoXZ(vectors: np.ndarray) -> np.ndarray:
+    """
+    Orthogonally project row vectors onto the XZ plane by dropping Y.
+
+    The B axis rotates the head about +Y, so the only orientations it can
+    reach lie in the XZ plane. Projecting is what the machine physically
+    does to a requested direction: the Y component is simply unreachable,
+    and dropping it leaves the part of the vector B can actually track,
+    with the signs of both x and z intact.
+
+    Note this is a projection, not a rotation - a vector leaning out of the
+    XZ plane comes back shorter. The length it loses, asin(|y| / |v|), is
+    exactly the orientation error the B axis cannot remove.
+    """
     x, y, z = vectors[:, 0], vectors[:, 1], vectors[:, 2]
-    theta = np.arctan2(y, z)
 
-    x_ = x
-    y_ = y * np.cos(theta) - z * np.sin(theta)
-    z_ = y * np.sin(theta) + z * np.cos(theta)
+    return np.column_stack((x, np.zeros_like(y), z))
 
-    return np.column_stack((x_, y_, z_))
+
+def calcBAngle(tangents: np.ndarray) -> np.ndarray:
+    """
+    B axis angle, in degrees, that points the nozzle along each centerline
+    tangent.
+
+    B rotates the head about +Y, aiming the nozzle along
+
+        n(B) = (sin B, 0, cos B)
+
+    so the best B for a tangent t is the one maximising n(B) . t, i.e.
+    sin B * tx + cos B * tz, giving
+
+        B = degrees(atan2(tx, tz))
+
+    which is the signed angle of the tangent projected onto XZ (see
+    projectOntoXZ), measured from +Z towards +X. Two properties matter:
+
+    - It is signed. A tangent leaning +X gives positive B and one leaning
+      -X gives negative B, so the head tilts the way the tube actually
+      leans. Taking a magnitude (arccos, or hypot(tx, ty)) collapses both
+      onto one sign and tilts the head backwards over half of an S-bend.
+    - atan2 keeps the sign of tz, so the angle runs continuously through
+      the horizontal (B = +/-90) and on to +/-180 for a tangent aimed
+      downwards, instead of folding back toward zero there.
+
+    A tangent leaning out of the XZ plane cannot be tracked by B alone;
+    this returns the closest reachable angle and the residual misalignment
+    is asin(|ty|). Removing it needs a bed/head rotation about Z, which the
+    emitter does not model yet.
+    """
+    return np.degrees(np.arctan2(tangents[:, 0], tangents[:, 2]))
 
 
 def calcFeedrates(
@@ -84,14 +124,8 @@ def emitGcode(
     points = flowSpiral.spiral.points
     tangents = flowSpiral.spiral.tangents
 
-    # rotate the tangent vector onto the XZ plane
-    toolheadVector = rotOntoXZ(tangents)
-
-    # determine the angle of the vector relative to + z
-    cosBRotation = np.dot(toolheadVector, [0, 0, 1])
-
-    # use that to determine B angle
-    bRotation = -1 * np.degrees(np.arccos(cosBRotation))
+    # B angle that aims the nozzle along the centerline tangent
+    bRotation = -1 * calcBAngle(tangents)
 
     slicedPoints = np.column_stack((points[:, 0], points[:, 1], points[:, 2], bRotation))
 

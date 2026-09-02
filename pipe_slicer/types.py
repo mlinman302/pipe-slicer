@@ -116,14 +116,14 @@ class GCodeConfig:
     """
     Printer and material parameters needed to turn a path into extrusion moves.
     """
-    filamentDiameter: float = 1.75  # filament stock diameter
-    lineWidth: float = 0.45         # extruded bead width (single wall in vase mode)
-    printFeedrate: float = 900.0    # extrusion move speed, mm/min
-    travelFeedrate: float = 6000.0  # non-extruding move speed, mm/min
-    firstLayerFeedrate: float = 300 # extrusion speed at the build plate, mm/min
-    speedRampLayers: float = 3.0    # windings over which the feedrate recovers to printFeedrate
+    filamentDiameter: float = 1.75    # filament stock diameter
+    lineWidth: float = 0.45           # extruded bead width (single wall in vase mode)
+    printFeedrate: float = 900.0      # extrusion move speed, mm/min
+    travelFeedrate: float = 1000.0    # non-extruding move speed, mm/min
+    firstLayerFeedrate: float = 450.0 # extrusion speed at the build plate, mm/min
+    speedRampLayers: float = 2.0      # windings over which the feedrate recovers to printFeedrate
     nozzleTemp: float = 200.0
-    bedTemp: float = 60.0
+    bedTemp: float = 0.0
 
     def filamentArea(self) -> float:
         return np.pi * (self.filamentDiameter / 2.0) ** 2
@@ -140,7 +140,7 @@ class PurgeConfig:
     sweep: float = 180.0        # angle swept by each arc, degrees
     startAngle: float = 0.0     # azimuth the first arc starts at, degrees
     passes: int = 2             # concentric arcs, each stepped inward by lineWidth
-    layerHeight: float = 0.3    # z height / bead thickness of the purge arcs
+    layerHeight: float = 0.2    # z height / bead thickness of the purge arcs
     lineWidth: float = 0.6      # bead width (wider than the part, as is usual for a purge)
     feedrate: float = 900.0     # extrusion speed of the purge, mm/min
     segmentAngle: float = 2.0   # arc discretization step, degrees
